@@ -29,6 +29,7 @@
           <tr>
             <th scope="col">ID</th>
             <th scope="col">Name</th>
+            <th scope="col">Technologies</th>
             <th scope="col">Type</th>
             <th scope="col">Status</th>
             <th scope="col">Create At</th>
@@ -42,7 +43,14 @@
             <th scope="row">{{$project->id}}</th>
             <td>{{$project->name}}</td>
             <td>
+              @forelse ($project->technologies as $technology)
+              <span class="badge" style="background-color: {{$technology->color}}">{{$technology->label}}</span>  
+              @empty
+              -    
+              @endforelse
               
+            </td>
+            <td>
               @if($project->type)
               <span class="badge" style="background-color: {{$project->type->color}}">{{$project->type->label}}</span>
               @else
