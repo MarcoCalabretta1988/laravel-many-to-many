@@ -22,6 +22,7 @@ class ProjectController extends Controller
         $query = Project::orderBy('updated_at', 'DESC');
 
         $types = Type::all();
+        $technologies = Technology::select('label', 'id')->get();
 
         if ($filter) {
             $value = $filter === 'drafts' ? 0 : 1;
@@ -29,7 +30,7 @@ class ProjectController extends Controller
         }
 
         $projects = $query->Paginate(10);
-        return view('admin.projects.index', compact('projects', 'filter', 'types'));
+        return view('admin.projects.index', compact('projects', 'filter', 'types', 'technologies'));
     }
 
     /**
@@ -161,6 +162,7 @@ class ProjectController extends Controller
     {
 
         if ($project->image) Storage::delete($project->image);
+        if (count($project->technologies)) $project->technologies()->detach();
         $project->delete();
         return to_route('admin.projects.index')->with('type', 'success')->with('msg', 'Progetto eliminato con successo');
     }

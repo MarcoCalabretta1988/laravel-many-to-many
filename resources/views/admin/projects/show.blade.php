@@ -13,6 +13,7 @@
   <img src=@if($project->image){{ asset('storage/' . $project->image)}} @else "https://media.istockphoto.com/id/1357365823/vector/default-image-icon-vector-missing-picture-page-for-website-design-or-mobile-app-no-photo.jpg?s=612x612&w=0&k=20&c=PM_optEhHBTZkuJQLlCjLz-v3zzxp-1mpNQZsdjrbns=" @endif alt="$project->name" class="img-fluid">
 </div>
   <div class="col">
+    <div class="my-2"><strong>Description: </strong></div>
     <p>{{$project->description}}</p>
     <hr>
     <strong>Create at: </strong> <time>{{ $project->created_at}}</time>
@@ -22,15 +23,25 @@
     <div>
       <strong>Type: </strong>{{$project->type?->label}}
     </div>
-    <form action="{{ route('admin.projects.toggle', $project->id)}}" method="POST" class="my-2">
-      @method('PATCH')
-      @csrf
-      <button type="submit" class="btn {{ $project->is_published ? 'text-success' : 'text-danger'}}">
-        <i class="fa-solid fa-2x fa-toggle-{{ $project->is_published ? 'on' : 'off'}}"></i>
-          {{ $project->is_published ? 'Switch in draft' : 'Switch in published'}}
-        </button>
-    
-    </form>
+    <div class="my-2">
+      <div class="my-2"><strong>Technologies: </strong></div>
+      @foreach  ($project->technologies as $technology)
+      <span class="badge" style="background-color: {{$technology->color}}">{{$technology->label}}</span>       
+      @endforeach
+    </div>
+    <hr>
+    <div class="d-flex justify-content-end">
+
+      <form action="{{ route('admin.projects.toggle', $project->id)}}" method="POST" class="my-2">
+        @method('PATCH')
+        @csrf
+        <button type="submit" class="btn {{ $project->is_published ? 'text-success' : 'text-danger'}}">
+          <i class="fa-solid fa-2x fa-toggle-{{ $project->is_published ? 'on' : 'off'}}"></i>
+            {{ $project->is_published ? 'Switch in draft' : 'Switch in published'}}
+          </button>
+      
+      </form>
+    </div>
 </div>
 </div>
 
