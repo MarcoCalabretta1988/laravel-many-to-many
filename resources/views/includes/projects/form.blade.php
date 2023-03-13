@@ -19,7 +19,7 @@
 
 {{-- FORM INPUT FIELD --}}
 <div class="row py-5">
-   
+   {{-- NAME INPUT --}}
     <div class="col-4">
         <div class="mb-3">
             <label for="name" class="form-label">Name:</label>
@@ -32,7 +32,7 @@
                 @enderror
         </div>
     </div>
-
+{{-- TYPE SELECT --}}
     <div class="col-3">
         <label for="Type" class="form-label">Type:</label>
         <select class="form-select @error('type_id') is-invalid @enderror" id="type" name="type_id">
@@ -48,7 +48,7 @@
       
        @enderror
     </div>
-
+{{-- IMG UPLOAD --}}
     <div class="col-4">
         <div class="mb-3">
             <label for="image" class="form-label">Url:</label>
@@ -61,11 +61,11 @@
                 @enderror
         </div>
     </div>
-
+{{-- IMG PREVIEW --}}
     <div class="col-1">
         <img src="{{ $project->image ? asset('storage/' . $project->image) : 'https://media.istockphoto.com/id/1357365823/vector/default-image-icon-vector-missing-picture-page-for-website-design-or-mobile-app-no-photo.jpg?s=612x612&w=0&k=20&c=PM_optEhHBTZkuJQLlCjLz-v3zzxp-1mpNQZsdjrbns='}}" alt="{{ old('name', $project->name) }}" class="img-fluid" id="img-prev">
     </div>
-   
+   {{-- DESCRIPTION INPUT --}}
     <div class="col-12">
         <div class="mb-5">
             <label for="description" class="form-label">Description:</label>
@@ -77,6 +77,16 @@
          @enderror
         </div>
     </div>
+{{-- TECHNOLOGY CHECKBOX --}}
+   <div class="col-12">
+    <h5>Technologies:</h5>
+    @foreach ($technologies as $technology )  
+    <div class="form-check form-check-inline">
+        <input class="form-check-input" type="checkbox" id="tech-{{$technology->label}}" value="{{$technology->id}}" name="technologies[]" @if(in_array($technology->id,old('technologies',$project_technologies ?? [] ))) checked @endif>
+        <label class="form-check-label" for="tech-{{$technology->label}}">{{$technology->label}}</label>
+      </div>
+      @endforeach
+   </div>
 </div>
 <div class="d-flex justify-content-end">
     <a href="{{ route('admin.projects.index')}}" class="btn btn-primary me-2"><i class="fa-solid fa-arrow-left"></i> Back </a>

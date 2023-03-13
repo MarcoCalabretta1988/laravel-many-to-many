@@ -6,6 +6,7 @@ use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Http\Controllers\Controller;
+use App\Models\Technology;
 use App\Models\Type;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
@@ -36,9 +37,11 @@ class ProjectController extends Controller
      */
     public function create()
     {
-        $types = Type::all();
         $project = new Project();
-        return view('admin.projects.create', compact('project', 'types'));
+        $types = Type::all();
+        $technologies = Technology::select('label', 'id')->get();
+        $project_technologies = [];
+        return view('admin.projects.create', compact('project', 'types', 'project_technologies', 'technologies'));
     }
 
     /**
@@ -51,7 +54,8 @@ class ProjectController extends Controller
             'name' => 'required|string| unique:projects| min:1| max:50',
             'description' => 'required|string',
             'image' => 'nullable|image|mimes:jpg,jpeg,png',
-            'type_id' => 'nullable|exists:types,id'
+            'type_id' => 'nullable|exists:types,id',
+            'technology_id' => 'nullable|exists:technology,id',
         ], [
             'name.required' => 'Il campo nome é obbligatorio',
             'name.string' => 'Il nome deve essere una stringa',
@@ -62,10 +66,12 @@ class ProjectController extends Controller
             'description.string' => 'La descrizione deve essere una stringa',
             'image.image' => 'Il campo imagine deve essere un file',
             'image.mimes' => 'L\'immagine deve essere JPEG,PNG,JPG',
-            'type.id' => 'Tipo non valido'
+            'type.id' => 'Tipo non valido',
+            'technology.id' => 'Not valid technology'
         ]);
 
         $data = $request->all();
+
 
         $project = new Project();
 
@@ -78,6 +84,12 @@ class ProjectController extends Controller
         $project->linkedin = "www.linkedin.com/in/marco-calabretta-2b1b13195";
         $project->fill($data);
         $project->save();
+
+        dd($data);
+
+        if (Arr::exists($data, 'technologies')) $project->technologies()->attach($data['technologies']);
+
+
         return to_route('admin.projects.show', $project->id)->with('type', 'success')->with('msg', 'Crezione avvenuta con successo');
     }
 
@@ -95,7 +107,9 @@ class ProjectController extends Controller
     public function edit(Project $project)
     {
         $types = Type::all();
-        return view('admin.projects.edit', compact('project', 'types'));
+        $technologies = Technology::all();
+        $project_technologies = $project->technologies->pluck('id')->toArray();
+        return view('admin.projects.edit', compact('project', 'types', 'technologies', 'project_technologies'));
     }
 
     /**
@@ -108,7 +122,8 @@ class ProjectController extends Controller
             'name' => ['required', 'string', Rule::unique('projects')->ignore($project->id), 'min:1', 'max:50'],
             'description' => 'required|string',
             'image' => 'nullable|image|mimes:jpg,jpeg,png',
-            'type_id' => 'nullable|exists:types,id'
+            'type_id' => 'nullable|exists:types,id',
+            'technology_id' => 'nullable|exists:technology,id',
         ], [
             'name.required' => 'Il campo nome é obbligatorio',
             'name.string' => 'Il nome deve essere una stringa',
@@ -119,7 +134,8 @@ class ProjectController extends Controller
             'description.string' => 'La descrizione deve essere una stringa',
             'image.image' => 'Il file deve essere un Immagine',
             'image.mimes' => 'L\'immagine deve essere JPEG,PNG,JPG',
-            'type.id' => 'Tipo non valido'
+            'type.id' => 'Tipo non valido',
+            'technology.id' => 'Not valid technology'
         ]);
 
         $data = $request->all();
@@ -131,6 +147,10 @@ class ProjectController extends Controller
         $project->github = "https://github.com/MarcoCalabretta1988";
         $project->linkedin = "www.linkedin.com/in/marco-calabretta-2b1b13195";
         $project->update($data);
+
+        if (Arr::exists($data, 'technologies')) $project->technologies()->sync($data['technologies']);
+        elseif (count($project->technologies)) $project->technologies()->detach();
+
         return to_route('admin.projects.show', $project->id)->with('type', 'success')->with('msg', 'Modifica avvenuta con successo');
     }
 
