@@ -37,7 +37,7 @@ class TechnologyController extends Controller
 
 
         $request->validate([
-            'label' => 'required|string| unique:types| min:1| max:50',
+            'label' => 'required|string| unique:technology| min:1| max:50',
             'color' => 'required|string|min:7|max:7',
 
         ], [
@@ -75,7 +75,7 @@ class TechnologyController extends Controller
     public function update(Request $request, Technology $technology)
     {
         $request->validate([
-            'label' => ['required', 'string', Rule::unique('types')->ignore($technology->id), 'min:1', 'max:50'],
+            'label' => ['required', 'string', Rule::unique('technology')->ignore($technology->id), 'min:1', 'max:50'],
             'color' => 'required|string|min:7|max:7',
 
         ], [
